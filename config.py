@@ -1,0 +1,11 @@
+import configparser
+
+config= configparser.ConfigParser()
+
+config.read('config.ini')
+
+AZURE_OPENAI_API_KEY= config['OPENAI']['AZURE_OPENAI_API_KEY']
+AZURE_OPENAI_ENDPOINT= config['OPENAI']['AZURE_OPENAI_ENDPOINT']
+CONNECTION_STRING= config['CONNECTION_STRING']['CONNECTION_STRING']
+SECRET_KEY= config['ENCODING']['SECRET_KEY']
+ALGORITHM= config['ENCODING']['ALGORITHM']

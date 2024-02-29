@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.router.detect_outliers import router
+from app.router import sessions
+from app.router import auth
 
 app = FastAPI()
 
@@ -12,7 +13,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router)
+#app.include_router(router)
+app.include_router(auth.router)
+app.include_router(sessions.router)
+
 
 @app.get("/")
 async def root():
@@ -21,4 +25,3 @@ async def root():
 @app.get("/health")
 async def health_check():
     return True
-    #return {"status": "ok"}

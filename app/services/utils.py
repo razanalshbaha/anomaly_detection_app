@@ -4,8 +4,10 @@ import os
 from langchain.chat_models import AzureChatOpenAI
 import seaborn as sns
 import matplotlib.pyplot as plt
-from prompts.select_features import template_string
-from app.data.config import AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT
+from app.prompts.select_features import template_string
+from config import AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT
+
+
 
 def feature_selection(file_path):
     chat = AzureChatOpenAI(api_version="2023-07-01-preview", azure_deployment="razz2", temperature= 0.2)
@@ -29,14 +31,9 @@ def get_anomalies_data(file_path, anomalies):
         outlier_rows = df[df[feature].isin(outlier_values)]
         outlier_df = pd.concat([outlier_df, outlier_rows])
     
-    output_folder = 'output'
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
+    anomalies_data = outlier_df.to_dict(orient='records')
+    return anomalies_data
     
-    output_file_path = os.path.join(output_folder, 'anomalies.csv')
-    outlier_df.to_csv(output_file_path, index=False)
-
-
 
 def plot_decorator(func):
     def wrapper(*args):
@@ -71,4 +68,5 @@ def plot_outliers(data, feature):
     else:
         sns.countplot(x=feature, data=data, palette='viridis')
         plt.title(f'Countplot of {feature}')
+
 
