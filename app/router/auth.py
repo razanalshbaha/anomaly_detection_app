@@ -1,68 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from passlib.context import CryptContext
-from datetime import datetime, timedelta
-from app.schema.schema import users_collection
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from datetime import timedelta, datetime
+from app.database.database import users_collection
+from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
-from pydantic import BaseModel
 from typing import Annotated
 from config import ALGORITHM, SECRET_KEY
 from bson import ObjectId
+from app.services.router_utils import bcrypt_context, oauth2_bearer, authenticate_user, authenticate_user_email, create_access_token, CreateUserRequest, Token, Response
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
-bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
-
-def authenticate_user(email: str, password: str):
-    user = users_collection.find_one({"email": email})
-    if not user:
-        return None
-    if not bcrypt_context.verify(password, user['hashed_password']):
-        return None
-    return user
-
-
-def create_access_token(email: str, user_id: str, expires_delta: timedelta):
-    encode = {"sub": email, "id": user_id}
-    expires = datetime.utcnow() + expires_delta
-    encode.update({"exp": expires})
-    return jwt.encode(encode, SECRET_KEY, ALGORITHM)
-
-
-class CreateUserRequest(BaseModel):
-    email: str
-    password: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        user_id: str = payload.get("id")
-        if email is None or user_id is None:
-            print("")
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate user.",
-            )
-        user = users_collection.find_one({"email": email})
-        print(user)
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not found.",
-            )
-        return {"email": email, "id": user_id}
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user."
-        )
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
@@ -73,6 +19,12 @@ async def create_user(create_user_request: CreateUserRequest):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already in use."
         )
+    if not authenticate_user_email(create_user_request.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid email."
+        )
+
     hashed_password = bcrypt_context.hash(create_user_request.password)
     new_user = {
         "id": str(ObjectId()),
@@ -81,7 +33,7 @@ async def create_user(create_user_request: CreateUserRequest):
         "is_active": True,
     }
     users_collection.insert_one(new_user)
-    return "Account created successfully"
+    return Response(message="Account created successfully")
 
 
 @router.post("/token", response_model=Token)

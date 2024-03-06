@@ -11,14 +11,14 @@ class OutlierDetection:
         return df
     
     @staticmethod
-    def select_features(file_path):
-        features= feature_selection(file_path)
+    async def select_features(file_path):
+        features= await feature_selection(file_path)
         return features
-
+    
     @staticmethod
     def plot(file_path, features):
-        plot_outliers(file_path, features)
-
+        return plot_outliers(file_path, features)
+    
     @staticmethod
     def detect_outliers(file_path, features):
         df= OutlierDetection.read_csv(file_path)
@@ -43,3 +43,4 @@ class OutlierDetection:
     def get_anomalies(file_path, feature_outliers):
         anomalies= get_anomalies_data(file_path, feature_outliers)
         return anomalies
+
