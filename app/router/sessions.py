@@ -8,6 +8,10 @@ from io import BytesIO
 from app.services.router_utils import user_dependency, authenticate_session_name
 
 
+from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+
+
 router = APIRouter()
 
 
@@ -33,6 +37,8 @@ async def create_session(user: user_dependency, file : UploadFile = File(...)):
             "file": file_data,
             "updated_file": anomalies
         }
+
+        # azure sdk to upload to blob
 
         session_data.update(plots)
 

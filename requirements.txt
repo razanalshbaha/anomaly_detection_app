@@ -101,3 +101,5 @@ virtualenv==20.25.1
 xattr==1.1.0
 yarl==1.9.4
 zipp==3.17.0
+azure-storage-blob
+azure-identity
