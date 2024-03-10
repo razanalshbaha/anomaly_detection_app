@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from pydantic import BaseModel
 from config import CONNECTION_STRING
 
 

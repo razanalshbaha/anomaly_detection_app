@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from datetime import timedelta
+from datetime import timedelta, datetime
 from app.database.database import users_collection
 from fastapi.security import OAuth2PasswordRequestForm
+from jose import jwt, JWTError
+from typing import Annotated
 from config import ALGORITHM, SECRET_KEY
 from bson import ObjectId
-from app.services.router_utils import bcrypt_context, authenticate_user, get_all_sessions, authenticate_user_email, create_access_token, CreateUserRequest, Token, Response
+from app.services.router_utils import bcrypt_context, oauth2_bearer, authenticate_user, authenticate_user_email, create_access_token, CreateUserRequest, Token, Response
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -43,7 +45,4 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             detail="Invalid username or password.",
         )
     token = create_access_token(user["email"], str(user["id"]), timedelta(minutes=30))
-    all_sessions= get_all_sessions(user["id"])
-    # print(all_sessions)
-    return {"access_token": token, "token_type": "bearer", "sessions": all_sessions}
-    # return {"sessions": all_sessions}
+    return {"access_token": token, "token_type": "bearer"}

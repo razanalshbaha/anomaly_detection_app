@@ -8,6 +8,7 @@ from config import ALGORITHM, SECRET_KEY
 from typing import Annotated
 from app.database.database import sessions_collection
 import re
+#from app.router.auth import get_current_user
 from pydantic import BaseModel
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -54,7 +55,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
                 detail="Could not validate user.",
             )
         user = users_collection.find_one({"email": email})
-        # print(user)
+        print(user)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -66,7 +67,6 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user."
         )
 
-
 def authenticate_session_name(Session_name: str, id: int):
     session = sessions_collection.find_one({"owner_id": id, "id": Session_name})
     if not session:
@@ -74,21 +74,7 @@ def authenticate_session_name(Session_name: str, id: int):
     return False
 
 def get_all_sessions(id: int):
-    # somne fields are of type base64, so we need to send them to the client as bytes
-    # import base64
-    # s = []
     sessions = sessions_collection.find({"owner_id": id})
-    # for session in sessions:
-    #     session["plot_LineId"] = base64.b64encode(session["plot_LineId"])
-    #     session["plot_Logrecord"] = base64.b64encode(session["plot_Logrecord"])
-    #     session["plot_Date"] = base64.b64encode(session["plot_Date"])
-    #     session["plot_Pid"] = base64.b64encode(session["plot_Pid"])
-    #     session["plot_Level"] = base64.b64encode(session["plot_Level"])
-    #     session["plot_Component"] = base64.b64encode(session["plot_Component"])
-    #     session["plot_EventId"] = base64.b64encode(session["plot_EventId"])
-    #     session["plot_EventTemplate"] = base64.b64encode(session["plot_EventTemplate"])
-
-        # s.append(session)
     sessions_list = list(sessions)
     return sessions_list
 

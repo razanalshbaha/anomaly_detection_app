@@ -1,6 +1,7 @@
 from langchain.prompts import ChatPromptTemplate
 import pandas as pd
 import os
+#from langchain.chat_models import AzureChatOpenAI
 from langchain_openai import AzureChatOpenAI
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -9,6 +10,7 @@ from app.prompts.select_features import template_string
 from app.database.database import sessions_collection
 import ast
 from config import AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT
+#from .outlier_detection import OutlierDetection
 os.environ["AZURE_OPENAI_ENDPOINT"]=AZURE_OPENAI_ENDPOINT
 os.environ["AZURE_OPENAI_API_KEY"]=AZURE_OPENAI_API_KEY
 
@@ -24,7 +26,9 @@ async def feature_selection(file_path):
     customer_messages = prompt_template.format_messages(columns=col) 
     customer_response = await chat.ainvoke(customer_messages)
     response= customer_response.content
-    features_list = ast.literal_eval(response)
+    features_list = []
+    if isinstance(response, str):
+        features_list = ast.literal_eval(response)
     return features_list
 
 
