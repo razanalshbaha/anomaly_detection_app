@@ -8,24 +8,11 @@ from config import ALGORITHM, SECRET_KEY
 from typing import Annotated
 from app.database.database import sessions_collection
 import re
-#from app.router.auth import get_current_user
 from pydantic import BaseModel
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
-class CreateUserRequest(BaseModel):
-    email: str
-    password: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class Response(BaseModel):
-    message: str
 
 def authenticate_user(email: str, password: str):
     user = users_collection.find_one({"email": email})

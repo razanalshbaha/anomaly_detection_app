@@ -1,7 +1,6 @@
 from langchain.prompts import ChatPromptTemplate
 import pandas as pd
 import os
-#from langchain.chat_models import AzureChatOpenAI
 from langchain_openai import AzureChatOpenAI
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -10,7 +9,6 @@ from app.prompts.select_features import template_string
 from app.database.database import sessions_collection
 import ast
 from config import AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT
-#from .outlier_detection import OutlierDetection
 os.environ["AZURE_OPENAI_ENDPOINT"]=AZURE_OPENAI_ENDPOINT
 os.environ["AZURE_OPENAI_API_KEY"]=AZURE_OPENAI_API_KEY
 
