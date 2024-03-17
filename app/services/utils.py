@@ -15,9 +15,9 @@ os.environ["AZURE_OPENAI_API_KEY"]=AZURE_OPENAI_API_KEY
 
 
 
-async def feature_selection(file_path):
+async def feature_selection(df):
     chat = AzureChatOpenAI(api_version="2023-07-01-preview", azure_deployment="razz2", temperature= 0.2)
-    df = pd.read_csv(file_path)
+    #df = pd.read_csv(file_path)
     col= df.columns
 
     prompt_template = ChatPromptTemplate.from_template(template_string)
@@ -30,8 +30,8 @@ async def feature_selection(file_path):
     return features_list
 
 
-def get_anomalies_data(file_path, anomalies):
-    df = pd.read_csv(file_path)
+def get_anomalies_data(df, anomalies):
+    #df = pd.read_csv(file_path)
     outlier_df = pd.DataFrame(columns=df.columns)
     
     for feature, outlier_values in anomalies.items():
@@ -45,8 +45,8 @@ def get_anomalies_data(file_path, anomalies):
 
 def plot_decorator(func):
     def wrapper(*args):
-        file_path, features = args
-        data = pd.read_csv(file_path)
+        data, features = args
+        #data = df
         plots = {}
 
         for feature in features:
@@ -80,6 +80,7 @@ def plot_outliers(data, feature):
     else:
         sns.countplot(x=feature, data=data, palette='viridis')
         plt.title(f'Countplot of {feature}')
+
 
 
 

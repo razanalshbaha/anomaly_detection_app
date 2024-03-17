@@ -21,15 +21,14 @@ async def create_session(user: user_dependency, file : UploadFile = File(...)):
         raise HTTPException(
             status_code= status.HTTP_401_UNAUTHORIZED
         )
-    with open(file.filename, "wb") as f:
-       f.write(file.file.read())
+    
+    # with open(file.filename, "wb") as f:
+    #    f.write(file.file.read())
 
-    df = pd.read_csv(file.filename)
-    #file_data = df.to_dict(orient='records')
     file_name= authenticate_session_name(file.filename, user['id'])
     if file_name:
         file_name= file.filename
-        anomalies, plots= await outlier_detection(file.filename)  
+        anomalies, plots= await outlier_detection(file)  
         anomalies_df= pd.DataFrame(anomalies)
 
         plots_list=[]
@@ -58,8 +57,8 @@ async def create_session(user: user_dependency, file : UploadFile = File(...)):
         }
 
         sessions_collection.insert_one(session_data)
-        csv_bytes=anomalies_df.to_csv(index=False).encode('utf-8')
-        os.remove(file.filename)
+        #csv_bytes=anomalies_df.to_csv(index=False).encode('utf-8')
+        #os.remove(file.filename)
         return {"file_id": file_id, "plots": plots_list}
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,

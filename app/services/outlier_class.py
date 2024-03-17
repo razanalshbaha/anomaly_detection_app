@@ -1,27 +1,30 @@
 import pandas as pd
 from .utils import feature_selection, get_anomalies_data, plot_outliers
+from io import BytesIO
 
 
 
 
 class OutlierDetection:
     @staticmethod
-    def read_csv(file_path):
-        df= pd.read_csv(file_path)
+    def read_csv(file):
+        csv_data = file.file.read()
+        csv_buffer = BytesIO(csv_data)
+        df = pd.read_csv(csv_buffer)
         return df
     
     @staticmethod
-    async def select_features(file_path):
-        features= await feature_selection(file_path)
+    async def select_features(df):
+        features= await feature_selection(df)
         return features
     
     @staticmethod
-    def plot(file_path, features):
-        return plot_outliers(file_path, features)
+    def plot(df, features):
+        return plot_outliers(df, features)
     
     @staticmethod
-    def detect_outliers(file_path, features):
-        df= OutlierDetection.read_csv(file_path)
+    def detect_outliers(df, features):
+        #df= OutlierDetection.read_csv(file_path)
         feature_outliers = {}
         for feature in features:
             if df[feature].dtype == 'object':
@@ -43,4 +46,6 @@ class OutlierDetection:
     def get_anomalies(file_path, feature_outliers):
         anomalies= get_anomalies_data(file_path, feature_outliers)
         return anomalies
+
+
 
