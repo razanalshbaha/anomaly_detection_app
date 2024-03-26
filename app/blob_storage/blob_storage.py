@@ -1,6 +1,5 @@
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+from azure.storage.blob import BlobServiceClient
 from config import AZURE_CONNECTION_STRING
 
 
-container_name= 'storagecommoncontainer'
 blob_service_client= BlobServiceClient.from_connection_string(AZURE_CONNECTION_STRING)
